@@ -1,0 +1,20 @@
+function neighborhood(solution):
+    moves = []
+    
+    for vertex1 in cycle1:
+        for vertex2 in cycle1[vertex1:]:
+            if vertex1 != vertex2:
+                moves.append((vertex1, vertex2))
+
+    for vertex1 in cycle2:
+        for vertex2 in cycle2[vertex1:]:
+            if vertex1 != vertex2:
+                moves.append((vertex1, vertex2))
+
+    for vertex1 in cycle1:
+        for vertex2 in cycle2:
+            if vertex1 != vertex2:
+                moves.append((vertex1, vertex2))
+
+    return moves
+    

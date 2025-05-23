@@ -1,0 +1,104 @@
+bestSolution = None
+i = 0
+while i < 200:
+    randomSolution = generateRandomSolution()
+
+    lmSteepestSolution = localSearchSteepestLM(randomSolution)
+    if bestSolution is None or lmSteepestSolution < bestSolution:
+        bestSolution = lmSteepestSolution
+    
+    i += 1
+
+return bestSolution
+
+function perturbateSolution(solution):
+    perturbatedSolution = solution
+    
+    perturbatedSolution = swap5VerticesBetweenCycles(perturbatedSolution)
+    perturbatedSolution = swap5VerticesInCycle(perturbatedSolution.cycle1)
+    perturbatedSolution = swap5VerticesInCycle(perturbatedSolution.cycle2)
+
+    return perturbatedSolution
+
+time = getCurrentTime()
+randomSolution = generateRandomSolution()
+bestSolution = localSearchSteepestLM(randomSolution)
+time = getCurrentTime() - time
+
+while time < maxTime:
+    startTime = getCurrentTime()
+    perturbatedSolution = perturbateSolution(bestSolution)
+    lmSteepestSolution = localSearchSteepestLM(perturbatedSolution)
+
+    if lmSteepestSolution < bestSolution:
+        bestSolution = lmSteepestSolution
+
+    time += getCurrentTime() - startTime
+
+return bestSolution
+
+
+function destroySolution(solution):
+    cycle1_vertex, cycle2_vertex = selectClosestVertices(solution.cycle1, solution.cycle2)
+
+    if random(0, 1) < 0.2:
+        cycle1_vertex, cycle2_vertex = selectRandomVertices(solution.cycle1, solution.cycle2)
+
+    newSolution, removedVertices1 = removeVertexAndNeighbours(solution.cycle1, cycle1_vertex)
+    newSolution, removedVertices2 = removeVertexAndNeighbours(solution.cycle2, cycle2_vertex)
+
+    return newSolution, removedVertices1 + removedVertices2
+
+function greedyCycleHeuristic(solution, removedVertices):
+
+    while removedVertices.notEmpty():
+        bestInsertion = None
+        for removedVertex in removedVertices:
+            elongationValue1 = 
+                calculateElongation(solution.cycle1, removedVertex) if solution.cycle1.size < 100 else infinity
+            elongationValue2 = 
+                calculateElongation(solution.cycle2, removedVertex) if solution.cycle2.size < 100 else infinity
+
+            if elongationValue1 < elongationValue2:
+                if bestInsertion is None or elongationValue1 < bestInsertion.elongationValue:
+                    bestInsertion = {
+                        'elongationValue': elongationValue1,
+                        'cycle': solution.cycle1,
+                        'vertex': removedVertex
+                    }
+                    removedVertices.remove(removedVertex)
+            else:
+                if bestInsertion is None or elongationValue2 < bestInsertion.elongationValue:
+                    bestInsertion = {
+                        'elongationValue': elongationValue2,
+                        'cycle': solution.cycle2,
+                        'vertex': removedVertex
+                    }
+                    removedVertices.remove(removedVertex)
+
+        if bestInsertion is not None:
+            solution = solution.insert(bestInsertion)
+
+    return solution
+
+
+time = getCurrentTime()
+randomSolution = generateRandomSolution()
+bestSolution = localSearchSteepestLM(randomSolution)
+time = getCurrentTime() - time
+
+while time < maxTime:
+    startTime = getCurrentTime()
+    
+    destroyedSolution, removedVertices = destroySolution(bestSolution)
+    newSolution = greedyCycleHeuristic(destroyedSolution, removedVertices)
+
+    if (doLocalSearch):
+        newSolution = localSearchSteepestLM(newSolution)
+
+    if newSolution < bestSolution:
+        bestSolution = newSolution
+
+    time += getCurrentTime() - startTime
+
+return bestSolution

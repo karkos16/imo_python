@@ -1,0 +1,63 @@
+initialSolution = generateRandomSolution()
+LM = generateAllPossibleMoves()
+
+while True:
+    bestMove = None
+    for move in LM:
+        if move is "applicable":
+            bestMove = move
+        else if move is "maybe applicable":
+            continue
+        else: 
+            remove move from LM
+            break
+    if bestMove is None:
+        break
+    
+    apply move to initialSolution (edge swap or vertices swap)
+    update solution cost
+    update LM with new valid moves
+
+return initialSolution
+
+
+function detect_new_moves(move):
+    if move is "vertex swap":
+        for swaped vertices add new swap moves to LM
+        for vertices affected by swap add new edge swap moves to LM
+    else if move is "edge swap":
+        for vertices affected by swap add new vertices swap moves to LM
+        for edges affected by swap add new edge swap moves to LM
+
+
+-- Candidate
+
+initialSolution = generateRandomSolution()
+candidates = generateNNearestNeighbors()
+
+improved = True
+
+while improved:
+    improved = False
+    bestMove = None
+
+    for each inter route move:
+        if vertices are candidates of each other:
+            if move is better than bestMove:
+                bestMove = move
+
+    for cycle in cycles from initialSolution:
+        for each vertex in cycle:
+            for each candidate of vertex:
+                choose better edge swap from [vertex and candidate as predecessors, 
+                                                vertex and candidate as successors] 
+                if move is better than bestMove:
+                    bestMove = move
+
+    if bestMove is not None:
+        apply move to initialSolution (edge swap or vertices swap)
+        update solution cost
+        improved = True
+        
+return initialSolution
+        
