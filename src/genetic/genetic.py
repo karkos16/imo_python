@@ -182,9 +182,13 @@ def solve_genetic(distances):
 
         new_solution = recombine(solution1, solution2)
 
+        if (len(new_solution[0][:-1]) != len(set(new_solution[0][:-1]))) or (len(new_solution[1][:-1]) != len(set(new_solution[1][:-1]))):
+            continue
+        if len(new_solution[0])  != 101 or len(new_solution[1]) != 101:
+            continue
+
         new_solution = solve_steepest_moves_list(new_solution, distances)
         if (len(new_solution[0][:-1]) != len(set(new_solution[0][:-1]))) or (len(new_solution[1][:-1]) != len(set(new_solution[1][:-1]))):
-            print("Error: new_solution has duplicates")
             continue
 
         new_length = calculate_route_length(new_solution[0], distances) + calculate_route_length(new_solution[1], distances)

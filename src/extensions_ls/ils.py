@@ -22,7 +22,6 @@ def solve_ils(distances):
         i = np.random.randint(0, n)
         j = np.random.randint(0, n)
         route[i], route[j] = route[j], route[i]
-        
 
     def perturbate_solution(routes):
         route1 = deepcopy(routes[0])

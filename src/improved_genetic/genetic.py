@@ -1,5 +1,5 @@
-from genetic.random_solver import random_solver
-from genetic.steepest_moves_list import solve_steepest_moves_list
+from improved_genetic.random_solver import solve_greedy
+from improved_genetic.steepest_moves_list import solve_steepest_moves_list
 import sys
 import numpy as np
 
@@ -8,7 +8,7 @@ from utils.read import calculate_route_length
 from time import perf_counter
 from copy import deepcopy
 
-def solve_genetic_without_ls(distances):
+def solve_genetic(distances):
     max_time = 329
     iterations = 0
     population_size = 20
@@ -20,7 +20,7 @@ def solve_genetic_without_ls(distances):
 
     def initialize_population():
         while len(population) < population_size:
-            routes = random_solver(distances)
+            routes = solve_greedy(distances)
             ls_solution = solve_steepest_moves_list(routes, distances)
 
             if (len(ls_solution[0][:-1]) != len(set(ls_solution[0][:-1]))) or (len(ls_solution[1][:-1]) != len(set(ls_solution[1][:-1]))):
@@ -159,7 +159,23 @@ def solve_genetic_without_ls(distances):
         new_cycle1, new_cycle2 = repair_solution([new_cycle1, new_cycle2], removed_cities)
 
         return (new_cycle1, new_cycle2)
+    
+    def mutate_solution(solution):
 
+        def random_swap_2(route1, route2):
+            n = len(route1)
+            i = np.random.randint(0, n)
+            j = np.random.randint(0, n)
+            route1[i], route2[j] = route2[j], route1[i]
+
+        cycle1 = deepcopy(solution[0][:-1])
+        cycle2 = deepcopy(solution[1][:-1])
+
+        for _ in range(5):
+            random_swap_2(cycle1, cycle2)
+        cycle1.append(cycle1[0])
+        cycle2.append(cycle2[0])
+        return (cycle1, cycle2)
 
     time_passed = perf_counter()
     initialize_population()
@@ -185,6 +201,13 @@ def solve_genetic_without_ls(distances):
         if (len(new_solution[0][:-1]) != len(set(new_solution[0][:-1]))) or (len(new_solution[1][:-1]) != len(set(new_solution[1][:-1]))):
             continue
         if len(new_solution[0])  != 101 or len(new_solution[1]) != 101:
+            continue
+
+        if np.random.rand() < 0.2:
+            new_solution = mutate_solution(new_solution)
+
+        new_solution = solve_steepest_moves_list(new_solution, distances)
+        if (len(new_solution[0][:-1]) != len(set(new_solution[0][:-1]))) or (len(new_solution[1][:-1]) != len(set(new_solution[1][:-1]))):
             continue
 
         new_length = calculate_route_length(new_solution[0], distances) + calculate_route_length(new_solution[1], distances)

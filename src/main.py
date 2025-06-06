@@ -2,7 +2,8 @@ import time
 import matplotlib.pyplot as plt
 import utils.read as utils
 from construct_alg import greedy_solver, random_solver
-from genetic import ils, lns, genetic, genetic_without_ls, greedy_cycle
+from genetic import ils, lns, genetic, genetic_without_ls, greedy_cycle, lns_without_ls
+from improved_genetic import genetic as improved_genetic
 import os
 
 def plot_route(cities, route1, route2, title):
@@ -19,10 +20,10 @@ def plot_route(cities, route1, route2, title):
     plt.title(title)
     plt.legend() 
 
-    if not os.path.exists('../plots/new'):
-        os.makedirs('../plots/new')
+    if not os.path.exists('../plots/improved_genetic'):
+        os.makedirs('../plots/improved_genetic')
 
-    plt.savefig(f"../plots/new/{title}.png")
+    plt.savefig(f"../plots/improved_genetic/{title}.png")
 
 if __name__ == "__main__":
     
@@ -35,8 +36,11 @@ if __name__ == "__main__":
         # "msls_solver": msls.solve_msls,
         # "ils_solver": ils.solve_ils,
         # "lns_solver": lns.solve_lns,
+        # "lns_without_ls_solver": lns_without_ls.solve_lns_without_ls,
         # "genetic_solver": genetic.solve_genetic,
-        "greedy_cycle_solver": greedy_cycle.solve_greedy_cycle,
+        # "genetic_without_ls_solver": genetic_without_ls.solve_genetic_without_ls,
+        # "greedy_cycle_solver": greedy_cycle.solve_greedy_cycle,
+        "improved_genetic_solver": improved_genetic.solve_genetic,
     }
 
     for instance in instances:
@@ -52,7 +56,7 @@ if __name__ == "__main__":
                 best_route = None
                 best_length = float('inf')
 
-                for _ in range(10):
+                for _ in range(5):
                     start_time = time.perf_counter()
                     route1, route2, iterations = solver(distances)
                     end_time = time.perf_counter()

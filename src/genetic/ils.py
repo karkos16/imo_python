@@ -51,9 +51,11 @@ def solve_ils(distances):
 
         perturbated_solution = perturbate_solution(best_solution)
 
-        print(f"Length of route 1: {len(perturbated_solution[0])}")
-        print(f"Length of route 2: {len(perturbated_solution[1])}")
-
+        if (len(perturbated_solution[0][:-1]) != len(set(perturbated_solution[0][:-1]))) or (len(perturbated_solution[1][:-1]) != len(set(perturbated_solution[1][:-1]))):
+            continue
+        if len(perturbated_solution[0]) != 101 or len(perturbated_solution[1]) != 101:
+            continue
+        
         new_solution = solve_steepest_moves_list(perturbated_solution, distances)
 
         if (len(new_solution[0][:-1]) != len(set(new_solution[0][:-1]))) or (len(new_solution[1][:-1]) != len(set(new_solution[1][:-1]))):

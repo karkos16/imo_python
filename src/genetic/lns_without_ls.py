@@ -9,7 +9,7 @@ from utils.read import calculate_route_length
 from time import perf_counter
 from copy import deepcopy
 
-def solve_lns(distances):
+def solve_lns_without_ls(distances):
 
     def find_closest_between_cycles(route1, route2):
         min_distance = float('inf')
@@ -63,7 +63,7 @@ def solve_lns(distances):
         new_route2 = route2[last_minus2 + 1:] + route2[:first_minus2] if need_change_order2 else [city for city in route2 if city != -1]
 
         if len(removed_cities) != len(set(removed_cities)):
-            return [], routes
+            return None, None
 
         return list(removed_cities), [new_route1, new_route2]
     
@@ -105,8 +105,13 @@ def solve_lns(distances):
 
         route1.append(route1[0])
         route2.append(route2[0])
+
+        if len(route1[:-1]) != len(set(route1[:-1])):
+            return []
         
-        return [route1, route2]
+        if len(route2[:-1]) != len(set(route2[:-1])):
+            return []
+        return route1, route2
 
     
 
@@ -118,39 +123,27 @@ def solve_lns(distances):
 
     times_passed = end_time - start_time
     max_time = 329
+    iterations = 0
 
     while (len(best_solution[0][:-1]) != len(set(best_solution[0][:-1]))) or (len(best_solution[1][:-1]) != len(set(best_solution[1][:-1]))):
         best_solution = solve_steepest_moves_list(random_solver(distances), distances)
-
-    iterations = 0
 
     while times_passed < max_time:
         start_time = perf_counter()
         removed_cities, new_solution = destroy_solution(best_solution)
 
-        if len(removed_cities) == 0:
-            times_passed += perf_counter() - start_time
+        if removed_cities is None or new_solution is None:
             continue
 
         new_solution = repair_solution(new_solution, removed_cities)
+
+        if new_solution == []:
+            continue
 
         if (len(new_solution[0][:-1]) != len(set(new_solution[0][:-1]))) or (len(new_solution[1][:-1]) != len(set(new_solution[1][:-1]))):
             continue
         if len(new_solution[0]) != 101 or len(new_solution[1]) != 101:
             continue
-
-        new_solution = solve_steepest_moves_list(new_solution, distances)
-
-        while (len(new_solution[0][:-1]) != len(set(new_solution[0][:-1]))) or (len(new_solution[1][:-1]) != len(set(new_solution[1][:-1]))):
-            removed_cities, new_solution = destroy_solution(best_solution)
-            new_solution = repair_solution(new_solution, removed_cities)
-
-            if (len(new_solution[0][:-1]) != len(set(new_solution[0][:-1]))) or (len(new_solution[1][:-1]) != len(set(new_solution[1][:-1]))):
-                continue
-            if len(new_solution[0]) != 101 or len(new_solution[1]) != 101:
-                continue
-
-            new_solution = solve_steepest_moves_list(new_solution, distances)
 
         new_length = calculate_route_length(new_solution[0], distances) + calculate_route_length(new_solution[1], distances)
 
@@ -163,4 +156,3 @@ def solve_lns(distances):
         iterations += 1
 
     return best_solution[0], best_solution[1], iterations
-
